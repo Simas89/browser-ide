@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
@@ -9,25 +9,36 @@ const Div = styled.div`
 	height: 100%;
 	display: flex;
 	flex-direction: row;
+
+	.resize-horizontal {
+		display: flex;
+	}
 `;
 
 const CodeCell = () => {
 	const [code, setCode] = useState('');
 	const [input, setInput] = useState('');
 
-	const onClick = async () => {
-		const output = await bundle(input);
-		setCode(output);
-	};
+	useEffect(() => {
+		const timer = setTimeout(async () => {
+			const output = await bundle(input);
+			setCode(output);
+		}, 1000);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [input]);
 
 	return (
 		<Resizable direction="vertical">
 			<Div>
-				<CodeEditor
-					initialValue="console.log(123);"
-					onChange={(value) => setInput(value)}
-				/>
-
+				<Resizable direction="horizontal">
+					<CodeEditor
+						initialValue="const root = document.querySelector('#root'); root.innerHTML = 5;"
+						onChange={(value) => setInput(value)}
+					/>
+				</Resizable>
 				<Preview code={code} />
 			</Div>
 		</Resizable>

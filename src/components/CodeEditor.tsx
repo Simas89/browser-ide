@@ -10,7 +10,7 @@ import Highlighter from 'monaco-jsx-highlighter';
 const Div = styled.div`
 	position: relative;
 	height: 100%;
-	width: 100%;
+	width: calc(100% - 10px);
 
 	&:hover .button-format {
 		opacity: 1;

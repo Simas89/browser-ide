@@ -4,10 +4,13 @@ import styled from 'styled-components';
 const Div = styled.div`
 	position: relative;
 	height: 100%;
+	flex-grow: 1;
+	/* overflow: hidden; */
 
 	iframe {
 		height: 100%;
-		background-color: white;
+		/* background-color: white; */
+		width: 100%;
 	}
 
 	.react-draggable-transparent-selection &:after {
@@ -33,7 +36,7 @@ const html = `
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>Document</title>
     </head>
-    <body>
+    <body style="background-color: white">
         <div id='root' />
         <script>
 
@@ -60,7 +63,9 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
 
 	useEffect(() => {
 		iframe.current.srcdoc = html;
-		iframe.current.contentWindow.postMessage(code, '*');
+		setTimeout(() => {
+			iframe.current.contentWindow.postMessage(code, '*');
+		}, 1000);
 	}, [code]);
 
 	return (
