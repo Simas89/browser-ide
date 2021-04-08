@@ -17,12 +17,14 @@ const Div = styled.div`
 
 const CodeCell = () => {
 	const [code, setCode] = useState('');
+	const [error, setError] = useState('');
 	const [input, setInput] = useState('');
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
 			const output = await bundle(input);
-			setCode(output);
+			setCode(output.code);
+			setError(output.error);
 		}, 1000);
 
 		return () => {
@@ -35,11 +37,11 @@ const CodeCell = () => {
 			<Div>
 				<Resizable direction="horizontal">
 					<CodeEditor
-						initialValue="const root = document.querySelector('#root'); root.innerHTML = 5;"
+						initialValue=""
 						onChange={(value) => setInput(value)}
 					/>
 				</Resizable>
-				<Preview code={code} />
+				<Preview code={code} error={error} />
 			</Div>
 		</Resizable>
 	);

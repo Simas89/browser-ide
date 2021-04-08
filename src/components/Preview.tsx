@@ -21,51 +21,59 @@ const Div = styled.div`
 		bottom: 0;
 		left: 0;
 	}
+
+	.previw-error {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		color: red;
+	}
 `;
 
 interface PreviewProps {
 	code: string;
+	error: string;
 }
 
 const html = `
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Document</title>
-    </head>
-    <body style="background-color: white">
-        <div id='root' />
+    <html>
+      <head>
+        <style>html { background-color: white; }</style>
+      </head>
+      <body>
+        <div id="root"></div>
         <script>
+          const handleError = (err) => {
+            const root = document.querySelector('#root');
+            root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + err + '</div>';
+            console.error(err);
+          };
 
-            window.addEventListener('message', (event)=>{
+          window.addEventListener('error', (event) => {
+            event.preventDefault();
+            handleError(event.error);
+          });
 
-                try {
-                    eval(event.data);
-                } catch (error) {
-                    const root = document.querySelector('#root');
-                    root.innerHTML = '<div style="color: red; "><h4>Runtime Error</h4>' + error + '</div>';
-                    console.error('Err: ',error);
-                }
-                
-                
-            }, false)
-
+          window.addEventListener('message', (event) => {
+            try {
+              eval(event.data);
+            } catch (err) {
+              handleError(err);
+            }
+          }, false);
         </script>
-    </body>
-</html>
-`;
+      </body>
+    </html>
+  `;
 
-const Preview: React.FC<PreviewProps> = ({ code }) => {
+const Preview: React.FC<PreviewProps> = ({ code, error }) => {
 	const iframe = useRef<any>();
 
 	useEffect(() => {
 		iframe.current.srcdoc = html;
 		setTimeout(() => {
 			iframe.current.contentWindow.postMessage(code, '*');
-		}, 1000);
+		}, 50);
 	}, [code]);
 
 	return (
@@ -76,6 +84,7 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
 				sandbox="allow-scripts"
 				srcDoc={html}
 			/>
+			{error && <div className="previw-error">{error}</div>}
 		</Div>
 	);
 };
